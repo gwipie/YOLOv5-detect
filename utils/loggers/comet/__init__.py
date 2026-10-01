@@ -321,7 +321,7 @@ class CometLogger:
         label_paths = img2label_paths(img_paths)
 
         for image_file, label_file in zip(img_paths, label_paths):
-            image_logical_path, label_logical_path = map(lambda x: os.path.relpath(x, path), [image_file, label_file])
+            image_logical_path, label_logical_path = (os.path.relpath(x, path) for x in [image_file, label_file])
 
             try:
                 artifact.add(
@@ -353,7 +353,7 @@ class CometLogger:
                 metadata[key] = split_path.replace(path, "")
 
         artifact = comet_ml.Artifact(name=dataset_name, artifact_type="dataset", metadata=metadata)
-        for key in metadata.keys():
+        for key in metadata:
             if key in ["train", "val", "test"]:
                 if isinstance(self.upload_dataset, str) and (key != self.upload_dataset):
                     continue
@@ -363,8 +363,6 @@ class CometLogger:
                     artifact = self.add_assets_to_artifact(artifact, path, asset_path, key)
 
         self.experiment.log_artifact(artifact)
-
-        return
 
     def download_dataset_artifact(self, artifact_path):
         """Downloads a dataset artifact to a specified directory using the experiment's logged artifact."""
@@ -420,15 +418,11 @@ class CometLogger:
         """Updates the current epoch in the experiment tracking at the end of each epoch."""
         self.experiment.curr_epoch = epoch
 
-        return
-
     def on_train_batch_end(self, log_dict, step):
         """Callback function that updates and logs metrics at the end of each training batch if conditions are met."""
         self.experiment.curr_step = step
         if self.log_batch_metrics and (step % self.comet_log_batch_interval == 0):
             self.log_metrics(log_dict, step=step)
-
-        return
 
     def on_train_end(self, files, save_dir, last, best, epoch, results):
         """Logs metadata and optionally saves model files at the end of training."""
