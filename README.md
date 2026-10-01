@@ -28,12 +28,12 @@ RDK X5 NV12 input → BPU inference → sigmoid/decode/NMS on host
 
 ## Project-specific files
 
-| File | Purpose |
-|---|---|
-| `data/VisDrone.yaml` | VisDrone2019-DET paths and 10 classes |
-| `models/yolo.py` | Export branch: detection-head conv output is transposed from NCHW to NHWC; sigmoid/grid/anchor decode is left to board-side post-processing |
-| `preprocess_640.py` | Generates representative 640×640 RGB/NCHW float32 calibration tensors |
-| `rdk_x5_config.yaml` | Bayes-e, NV12 runtime input, PTQ calibration and latency-oriented compile settings |
+| File                 | Purpose                                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data/VisDrone.yaml` | VisDrone2019-DET paths and 10 classes                                                                                                       |
+| `models/yolo.py`     | Export branch: detection-head conv output is transposed from NCHW to NHWC; sigmoid/grid/anchor decode is left to board-side post-processing |
+| `preprocess_640.py`  | Generates representative 640×640 RGB/NCHW float32 calibration tensors                                                                       |
+| `rdk_x5_config.yaml` | Bayes-e, NV12 runtime input, PTQ calibration and latency-oriented compile settings                                                          |
 
 ## Prepare calibration data
 
@@ -48,7 +48,7 @@ python preprocess_640.py \
 
 The script writes RGB/NCHW `float32` values in the `0..255` range. `rdk_x5_config.yaml` applies `data_scale=1/255`; do not divide the calibration tensors by 255 a second time.
 
-Use representative images covering target scale, density, lighting and viewpoints. Calibration data selects quantization ranges; a separate labelled validation split is still required to measure accuracy.
+Use representative images covering target scale, density, lighting and viewpoints. Calibration data selects quantization ranges; a separate labeled validation split is still required to measure accuracy.
 
 ## Train and export
 
