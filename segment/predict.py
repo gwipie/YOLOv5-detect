@@ -189,10 +189,6 @@ def run(
                 annotator.masks(
                     masks,
                     colors=[colors(x, True) for x in det[:, 5]],
-                    im_gpu=torch.as_tensor(im0, dtype=torch.float16).to(device).permute(2, 0, 1).flip(0).contiguous()
-                    / 255
-                    if retina_masks
-                    else im[i],
                 )
 
                 # Write results
