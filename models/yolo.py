@@ -75,6 +75,7 @@ class Detect(nn.Module):
     stride = None  # strides computed during build
     dynamic = False  # force grid reconstruction
     export = False  # export mode
+    rdk_x5_export = False  # export raw detection-head outputs for Horizon RDK X5
 
     def __init__(self, nc=80, anchors=(), ch=(), inplace=True):
         """Initializes YOLOv5 detection layer with specified classes, anchors, channels, and inplace operations."""
@@ -92,7 +93,7 @@ class Detect(nn.Module):
     def forward(self, x):
         """Processes input through YOLOv5 layers, altering shape for detection: `x(bs, 3, ny, nx, 85)`."""
         # RDK-X5 导出: 只做 conv + NCHW→NHWC，去掉后处理
-        if self.export and not isinstance(self, Segment):
+        if self.export and self.rdk_x5_export and not isinstance(self, Segment):
             z = []
             for i in range(self.nl):
                 x[i] = self.m[i](x[i])  # conv: (bs, na*no, ny, nx)

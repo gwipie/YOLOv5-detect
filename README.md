@@ -31,7 +31,7 @@ RDK X5 NV12 input → BPU inference → sigmoid/decode/NMS on host
 | File | Purpose |
 |---|---|
 | `data/VisDrone.yaml` | VisDrone2019-DET paths and 10 classes |
-| `models/yolo.py` | Export branch: detection-head conv output is transposed from NCHW to NHWC; sigmoid/grid/anchor decode is left to board-side post-processing |
+| `models/yolo.py` | `export.py --rdk-x5` branch: detection-head conv output is transposed from NCHW to NHWC; sigmoid/grid/anchor decode is left to board-side post-processing |
 | `preprocess_640.py` | Generates representative 640×640 RGB/NCHW float32 calibration tensors |
 | `rdk_x5_config.yaml` | Bayes-e, NV12 runtime input, PTQ calibration and latency-oriented compile settings |
 
@@ -54,9 +54,10 @@ Use representative images covering target scale, density, lighting and viewpoint
 
 ```bash
 python train.py --data data/VisDrone.yaml --weights yolov5s.pt --img 640
-python export.py --weights runs/train/exp/weights/best.pt --include onnx --imgsz 640 --opset 11
+python export.py --weights runs/train/exp/weights/best.pt --include onnx --imgsz 640 --opset 11 --rdk-x5
 ```
 
+The `--rdk-x5` option is specific to the Horizon board output contract. Leave it off for standard YOLOv5 exports and inference.
 Choose the ONNX opset according to both the installed exporter and the RDK toolchain support matrix. A higher opset is not automatically better.
 
 ## Compile for RDK X5

@@ -1298,6 +1298,7 @@ def run(
     topk_all=100,  # TF.js NMS: topk for all classes to keep
     iou_thres=0.45,  # TF.js NMS: IoU threshold
     conf_thres=0.25,  # TF.js NMS: confidence threshold
+    rdk_x5=False,  # export raw NHWC detection-head outputs for Horizon RDK X5
 ):
     """Exports a YOLOv5 model to specified formats including ONNX, TensorRT, CoreML, and TensorFlow.
 
@@ -1327,6 +1328,7 @@ def run(
         iou_thres (float): IoU threshold for NMS. Default is 0.45.
         conf_thres (float): Confidence threshold for NMS. Default is 0.25.
         mlmodel (bool): Flag to use *.mlmodel for CoreML export. Default is False.
+        rdk_x5 (bool): Export raw NHWC detection-head outputs for Horizon RDK X5. Default is False.
 
     Returns:
         (list[str]): Paths of the exported files/directories.
@@ -1399,6 +1401,7 @@ def run(
             m.inplace = inplace
             m.dynamic = dynamic
             m.export = True
+            m.rdk_x5_export = rdk_x5
 
     for _ in range(2):
         y = model(im)  # dry runs
@@ -1520,6 +1523,9 @@ def parse_opt(known=False):
     parser.add_argument("--topk-all", type=int, default=100, help="TF.js NMS: topk for all classes to keep")
     parser.add_argument("--iou-thres", type=float, default=0.45, help="TF.js NMS: IoU threshold")
     parser.add_argument("--conf-thres", type=float, default=0.25, help="TF.js NMS: confidence threshold")
+    parser.add_argument(
+        "--rdk-x5", action="store_true", help="Export raw NHWC detection-head outputs for Horizon RDK X5"
+    )
     parser.add_argument(
         "--include",
         nargs="+",
