@@ -12,8 +12,6 @@ on:
     branches: [main]
   pull_request:
     branches: [master]
-  schedule:
-    - cron: "0 0 * * *" # runs at 00:00 UTC every day
   workflow_dispatch:
 
 jobs:
@@ -60,7 +58,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-14] # macos-latest bug https://github.com/ultralytics/yolov5/pull/9049
-        python-version: ["3.x"] # evergreen latest stable Python
+        python-version: ["3.13"] # pin a tested release instead of adopting new CPython releases automatically
         model: [yolov5n]
         include:
           - os: ubuntu-latest
@@ -96,7 +94,9 @@ jobs:
           # export PYTHONPATH="$PWD"  # to run '$ python *.py' files in subdirectories
           m=${{ matrix.model }}  # official weights
           b=runs/train/exp/weights/best  # best.pt checkpoint
-          python train.py --imgsz 64 --batch 32 --weights $m.pt --cfg $m.yaml --epochs 1 --device cpu  # train
+          workers=8
+          if [ "${{ runner.os }}" = "Windows" ]; then workers=0; fi
+          python train.py --imgsz 64 --batch 32 --weights $m.pt --cfg $m.yaml --epochs 1 --device cpu --workers $workers  # train
           for d in cpu; do  # devices
             for w in $m $b; do  # weights
               python val.py --imgsz 64 --batch 32 --weights "$w.pt" --device $d  # val
@@ -121,8 +121,10 @@ jobs:
         run: |
           m=${{ matrix.model }}-seg  # official weights
           b=runs/train-seg/exp/weights/best  # best.pt checkpoint
-          python segment/train.py --imgsz 64 --batch 32 --weights $m.pt --cfg $m.yaml --epochs 1 --device cpu  # train
-          python segment/train.py --imgsz 64 --batch 32 --weights '' --cfg $m.yaml --epochs 1 --device cpu  # train
+          workers=8
+          if [ "${{ runner.os }}" = "Windows" ]; then workers=0; fi
+          python segment/train.py --imgsz 64 --batch 32 --weights $m.pt --cfg $m.yaml --epochs 1 --device cpu --workers $workers  # train
+          python segment/train.py --imgsz 64 --batch 32 --weights '' --cfg $m.yaml --epochs 1 --device cpu --workers $workers  # train
           for d in cpu; do  # devices
             for w in $m $b; do  # weights
               python segment/val.py --imgsz 64 --batch 32 --weights "$w.pt" --device $d  # val
