@@ -11,7 +11,7 @@ from pathlib import Path
 
 import torch
 import torch.distributed as dist
-import torch.nn as nn
+from torch import nn
 from torch.nn.parallel import DistributedDataParallel as DDP
 from ultralytics.utils.torch_utils import copy_attr, scale_img, time_sync  # noqa: F401
 
@@ -231,7 +231,7 @@ def sparsity(model):
 
 def prune(model, amount=0.3):
     """Prunes Conv2d layers in a model to a specified sparsity using L1 unstructured pruning."""
-    import torch.nn.utils.prune as prune
+    from torch.nn.utils import prune
 
     for name, m in model.named_modules():
         if isinstance(m, nn.Conv2d):
